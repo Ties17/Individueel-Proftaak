@@ -17,35 +17,49 @@ void setup() {
  // troubleshooting.        
  Serial.println("8x8 LED Matrix Test");       
  // set the address       
- m1.begin(0x70);
- m2.begin(0x71);
- m3.begin(0x72);   
+  
  
  initDisplays();
 }       
        
 void loop() { 
-  
-
-  
-  if(readPIRSensor()){
-    clearAllScreens();
+  int sector = getPotentioSector();
+  clearAllScreens();
+  if(sector == 0){
+    
+    initDisplays();
+    screenNumbers();
+    delay(1500);
+    
+  } else if (sector < 3){
     double temp1 = readTempSensor();
     drawTemperature(temp1);
+    delay(2000);
+  } else if (sector < 4) {
+    if(readPIRSensor()){
+      clearAllScreens();
+      double temp1 = readTempSensor();
+      drawTemperature(temp1);
+    }
+    delay(2000);
+  } else {
+    if(readPIRSensor()){
+      clearAllScreens();
+      double temp1 = readTempSensor();
+      drawTemperature(temp1);
+      }
+     delay(getRefreshDelay(sector));
   }
-   
-
-  delay(2000);
-
   
 }
 
 
 
 void initDisplays(){
-  m1.clear();
-  m2.clear();
-  m3.clear();
+  m1.begin(0x70);
+  m2.begin(0x71);
+  m3.begin(0x72);  
+  
   m1.setRotation(3);
   m2.setRotation(3);
   m3.setRotation(3);
@@ -56,16 +70,9 @@ void initDisplays(){
 }
 
 void screenNumbers(){
-  m1.clear();
-  m2.clear();
-  m3.clear();
-  m1.print("1");
-  m2.print("2");
-  m3.print("3");
-  
-  m1.writeDisplay();
-  m2.writeDisplay();
-  m3.writeDisplay();
+  drawNumber('1', 0, 0);
+  drawNumber('2', 8, 0);
+  drawNumber('3', 16, 0);
 }
 
 void clearAllScreens(){
@@ -145,6 +152,26 @@ double readTempSensor(){
   Serial.print(temp);
   Serial.println();
   return temp;
+}
+
+int readPotentiometer(){
+  int val = analogRead(A0);
+  Serial.print("potentiometer: ");
+  Serial.print(val);
+  Serial.println();
+  return val;
+}
+
+int getPotentioSector(){
+  return readPotentiometer()/128;
+}
+
+int getRefreshDelay(int sector){
+  switch (sector){
+    case 5: return 250;
+    case 6: return 1000;
+    case 7: return 2500;
+  }
 }
 
 //DRAWING NUMBERS
