@@ -1,9 +1,11 @@
 // For I2C       
-#include <Wire.h> 
-#include <Math.h>      
+#include <Wire.h>  
 // Libraries for Matrix       
 #include "Adafruit_LEDBackpack.h"       
-#include "Adafruit_GFX.h"       
+#include "Adafruit_GFX.h"    
+
+#define PIR_PIN A10
+
 Adafruit_8x8matrix m1 = Adafruit_8x8matrix();      
 Adafruit_8x8matrix m2 = Adafruit_8x8matrix();   
 Adafruit_8x8matrix m3 = Adafruit_8x8matrix();   
@@ -22,12 +24,23 @@ void setup() {
  initDisplays();
 }       
        
-void loop() {       
-  double temp1 = readTempSensor();
-  drawTemperature(temp1);
-  delay(2500);
-  clearAllScreens();
+void loop() { 
+  
+
+  
+  if(readPIRSensor()){
+    clearAllScreens();
+    double temp1 = readTempSensor();
+    drawTemperature(temp1);
+  }
+   
+
+  delay(2000);
+
+  
 }
+
+
 
 void initDisplays(){
   m1.clear();
@@ -115,11 +128,17 @@ void drawNumber(char number, int startX, int startY){
   }
 }
 
+bool readPIRSensor(){
+  bool pir = analogRead(PIR_PIN);
+  Serial.print("PIR sensor: ");
+  Serial.println(pir);
+  Serial.println();
+  return pir;
+}
+
 double readTempSensor(){
   float val = analogRead(A7);
   //double temp = (val/1024.0)*500;
-  
-  
   
   double temp = val*5000/(1024*10);
   Serial.print("temp: ");
