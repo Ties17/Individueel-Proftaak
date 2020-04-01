@@ -1,6 +1,8 @@
-// For I2C       
-#include <Wire.h>  
-// Libraries for Matrix       
+/*
+ * Author: Ties Tienhoven
+ */
+ 
+#include <Wire.h>      
 #include "Adafruit_LEDBackpack.h"       
 #include "Adafruit_GFX.h"    
 
